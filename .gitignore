@@ -1,0 +1,25 @@
+# --- Tableau --------------------------------------------------------------
+# Only the published workbook is tracked; drafts, earlier versions and
+# script-generated workbooks stay local.
+*.twbx
+!dashboard/Baltimore_Community_Health_Access.twbx
+*.twb
+*.twbr
+*.hyper
+*.tde
+T_Work/
+
+# --- Python ---------------------------------------------------------------
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# --- Office / OS temp files -----------------------------------------------
+~$*
+*- Copy.*
+Thumbs.db
+desktop.ini
+.DS_Store
+*:Zone.Identifier

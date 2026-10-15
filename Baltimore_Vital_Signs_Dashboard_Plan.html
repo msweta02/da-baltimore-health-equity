@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baltimore Vital Signs — Tableau dashboard plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  :root{
+    --ink:#1B1E1C;
+    --ink-soft:#4B4E49;
+    --bg:#F6F5F0;
+    --panel:#FFFFFF;
+    --line:#D9D6CC;
+    --teal:#0F6E56;
+    --teal-deep:#093F33;
+    --teal-pale:#E1F0EA;
+    --coral:#B0401F;
+    --coral-pale:#F7E7E1;
+    --amber:#8A5A12;
+    --amber-pale:#F5EBD8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif; line-height:1.55;
+  }
+  h1,h2,h3{font-family:'IBM Plex Serif',serif; font-weight:500; margin:0;}
+  header.hero{
+    background:var(--teal-deep); color:#F2F0E8;
+    padding:2.4rem 2.5rem 2rem;
+  }
+  header.hero .eyebrow{
+    font-size:.8rem; color:#9FCBBB; margin-bottom:.5rem;
+  }
+  header.hero h1{font-size:1.7rem; max-width:34rem;}
+  header.hero p{max-width:38rem; color:#CFE4DB; font-size:.95rem; margin-top:.7rem;}
+  .answer-strip{
+    display:flex; gap:1.5rem; margin-top:1.4rem; flex-wrap:wrap;
+  }
+  .answer-strip .num{
+    font-family:'IBM Plex Serif',serif; font-size:2rem; color:#fff;
+  }
+  .answer-strip .lbl{font-size:.78rem; color:#AFCFC3;}
+  .answer-strip .chip{border-left:2px solid #2E7C68; padding-left:1rem;}
+
+  nav.tabs{
+    display:flex; gap:0; border-bottom:1px solid var(--line);
+    background:var(--panel); padding:0 2.5rem; position:sticky; top:0; z-index:5;
+  }
+  nav.tabs button{
+    font-family:'IBM Plex Sans',sans-serif; font-size:.9rem; font-weight:500;
+    background:none; border:none; padding:1rem 1.1rem; cursor:pointer;
+    color:var(--ink-soft); border-bottom:2px solid transparent;
+  }
+  nav.tabs button.active{color:var(--teal-deep); border-bottom:2px solid var(--teal);}
+  nav.tabs button:hover{color:var(--teal-deep);}
+
+  main{max-width:960px; margin:0 auto; padding:2rem 2.5rem 4rem;}
+  .dash-panel{display:none;}
+  .dash-panel.active{display:block;}
+
+  .dash-head{display:flex; align-items:baseline; justify-content:space-between; gap:1rem; margin-bottom:.3rem; flex-wrap:wrap;}
+  .dash-head h2{font-size:1.3rem;}
+  .dash-head .tag{font-size:.75rem; color:var(--ink-soft); border:1px solid var(--line); padding:.25rem .6rem; border-radius:4px;}
+  .dash-sub{color:var(--ink-soft); font-size:.9rem; max-width:40rem; margin-bottom:1.6rem;}
+
+  /* mockup frame */
+  .mockup{
+    background:var(--panel); border:1px solid var(--line); border-radius:6px;
+    padding:1.2rem; margin-bottom:1.8rem;
+  }
+  .mockup .frame-label{
+    font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; color:#9A978C;
+    margin-bottom:.9rem;
+  }
+  .filterbar{display:flex; gap:.5rem; flex-wrap:wrap; padding-bottom:.8rem; margin-bottom:1rem; border-bottom:1px solid var(--line);}
+  .pill{display:flex; align-items:center; gap:.35rem; font-size:.78rem; border:1px solid var(--line); border-radius:5px; padding:.35rem .7rem; color:var(--ink-soft);}
+  .pill.on{border-color:var(--teal); color:var(--teal-deep); background:var(--teal-pale);}
+
+  .kpi-row{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.7rem; margin-bottom:.9rem;}
+  .kpi{background:var(--bg); border-radius:5px; padding:.75rem .85rem;}
+  .kpi .l{font-size:.72rem; color:var(--ink-soft); margin-bottom:.25rem;}
+  .kpi .v{font-size:1.25rem; font-family:'IBM Plex Serif',serif;}
+  .kpi .v.warn{color:var(--coral);}
+
+  .grid2{display:grid; grid-template-columns:3fr 2fr; gap:.7rem; margin-bottom:.9rem;}
+  .panel-block{
+    border:1px dashed var(--line); border-radius:8px; padding:1rem; min-height:190px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:.4rem;
+  }
+  .panel-block i{font-size:1.5rem; color:#B4B1A5;}
+  .panel-block .headline{font-size:.88rem; font-weight:500; font-family:'IBM Plex Serif',serif; color:var(--teal-deep); max-width:24rem; line-height:1.35;}
+  .panel-block .t{font-size:.72rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.02em;}
+  .panel-block .s{font-size:.72rem; color:var(--ink-soft);}
+  .headline.left{font-family:'IBM Plex Serif',serif; color:var(--teal-deep); font-size:.88rem; font-weight:500; line-height:1.35; margin-bottom:.7rem;}
+
+  .heat-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:2px; width:100%; max-width:180px; margin-top:.3rem;}
+  .heat-grid div{height:11px; border-radius:2px;}
+  .h1{background:var(--teal);} .h2{background:#4FA98C;} .h3{background:var(--teal-pale);} .h0{background:var(--bg);}
+
+  .barrow{display:grid; grid-template-columns:100px 1fr 36px; align-items:center; gap:.5rem; margin-bottom:.45rem;}
+  .barrow .k{font-size:.75rem; color:var(--ink-soft);}
+  .barrow .v{font-size:.75rem; color:var(--ink-soft); text-align:right;}
+  .bartrack{background:var(--bg); border-radius:3px; height:9px;}
+  .barfill{height:100%; border-radius:3px; background:var(--coral);}
+
+  .scorecards{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.6rem; margin-bottom:.9rem;}
+  .scorecard{background:var(--coral-pale); border-radius:5px; padding:.6rem .65rem;}
+  .scorecard .n{font-size:.78rem; font-weight:500; color:var(--coral); margin-bottom:.25rem;}
+  .scorecard .d{font-size:.68rem; color:var(--coral);}
+  .scorecard.dim{background:var(--bg); border:1px solid var(--line);}
+  .scorecard.dim .n{color:var(--ink);}
+  .scorecard.dim .d{color:var(--ink-soft);}
+  .read-key{font-size:.76rem; color:var(--ink-soft); max-width:44rem; margin:0 0 .8rem; line-height:1.5;}
+
+  .tiles4{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.6rem; margin-bottom:.9rem;}
+  .tile{border:1px solid var(--line); border-radius:5px; padding:.6rem .65rem;}
+  .tile .h{font-size:.74rem; font-weight:500; display:flex; gap:.35rem; align-items:center; margin-bottom:.35rem;}
+  .tile .h i{font-size:.9rem; color:#9A978C;}
+  .tile .r{font-size:.68rem; color:var(--ink-soft);}
+
+  .legend-row{display:flex; align-items:center; gap:1rem; flex-wrap:wrap; padding-top:.7rem; border-top:1px solid var(--line); font-size:.72rem; color:var(--ink-soft);}
+  .swatch{width:9px; height:9px; border-radius:2px; display:inline-block; margin-right:4px;}
+
+  /* spec section */
+  h3.spec-h{font-size:1rem; margin:1.8rem 0 .7rem; padding-top:1.2rem; border-top:1px solid var(--line);}
+  table.spec{width:100%; border-collapse:collapse; font-size:.83rem; margin-bottom:.5rem;}
+  table.spec th{text-align:left; font-weight:500; color:var(--ink-soft); font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; padding:.4rem .6rem; border-bottom:1px solid var(--line);}
+  table.spec td{padding:.55rem .6rem; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink);}
+  table.spec tr:last-child td{border-bottom:none;}
+  .src{font-family:'IBM Plex Sans',sans-serif; font-size:.76rem; background:var(--teal-pale); color:var(--teal-deep); padding:.1rem .4rem; border-radius:3px; white-space:nowrap;}
+
+  ul.notes{margin:0; padding-left:1.1rem; font-size:.85rem; color:var(--ink-soft);}
+  ul.notes li{margin-bottom:.4rem;}
+
+  footer{max-width:960px; margin:0 auto; padding:0 2.5rem 3rem; color:var(--ink-soft); font-size:.8rem;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">BNIA Vital Signs 2010–2023 · The Lily Foundation & Advocates</div>
+  <h1>Two dashboards carry the Board presentation</h1>
+  <p>Everything from the analysis resolves into two linked Tableau dashboards — a five-minute overview built to answer "where should we act," and a drivers-and-detail screen held in reserve for the questions that follow.</p>
+  <div class="answer-strip">
+    <div class="chip"><div class="num">2</div><div class="lbl">dashboards planned</div></div>
+    <div class="chip"><div class="num">9</div><div class="lbl">worksheets across both</div></div>
+    <div class="chip"><div class="num">7</div><div class="lbl">source sheets in the workbook</div></div>
+    <div class="chip"><div class="num">5</div><div class="lbl">communities highlighted throughout</div></div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="active" onclick="showDash(1,this)">Dashboard 1 — Overview &amp; recommendation</button>
+  <button onclick="showDash(2,this)">Dashboard 2 — Drivers &amp; service detail</button>
+</nav>
+
+<main>
+
+  <!-- ===================== DASHBOARD 1 ===================== -->
+  <section id="dash1" class="dash-panel active">
+    <div class="dash-head">
+      <h2>Overview &amp; recommendation</h2>
+      <span class="tag">Board's default landing screen</span>
+    </div>
+    <p class="dash-sub">Answers "where is the need greatest and where should we start" without leaving the first screen. Filters and highlight actions are shared across every worksheet on this dashboard.</p>
+
+    <div class="mockup">
+      <div class="frame-label">Layout — 680–960px canvas, single scroll</div>
+
+      <div class="filterbar">
+        <span class="pill"><i class="ti ti-map-pin"></i>All communities</span>
+        <span class="pill"><i class="ti ti-calendar"></i>2011–2023</span>
+        <span class="pill on" id="toggle-pill" onclick="toggleView()" style="cursor:pointer;"><i class="ti ti-toggle-right"></i><span id="toggle-label">Recommended 5 only</span></span>
+      </div>
+
+      <div class="headline left">The scale of the problem, in four numbers</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="l">Life expectancy gap</div><div class="v">13.2 yrs</div></div>
+        <div class="kpi"><div class="l">Highest-need residents</div><div class="v">129,237</div></div>
+        <div class="kpi"><div class="l">Chronic, 8 of 8 years</div><div class="v">5 areas</div></div>
+        <div class="kpi"><div class="l">Disparity trend</div><div class="v warn">Widening</div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel-block">
+          <i class="ti ti-map-2"></i>
+          <div class="headline">Deprivation and short life expectancy sit in the same neighborhoods</div>
+          <div class="t">Need &amp; life expectancy map</div>
+          <div class="s">CSA filled map, colored by tier, hover shows dimension scores</div>
+        </div>
+        <div class="panel-block">
+          <i class="ti ti-grid-dots"></i>
+          <div class="headline">The same communities have ranked worst for eight straight years</div>
+          <div class="t">Persistence heatmap</div>
+          <div class="heat-grid">
+            <div class="h1"></div><div class="h1"></div><div class="h2"></div><div class="h1"></div><div class="h1"></div><div class="h1"></div><div class="h1"></div><div class="h1"></div>
+            <div class="h1"></div><div class="h2"></div><div class="h1"></div><div class="h1"></div><div class="h1"></div><div class="h1"></div><div class="h1"></div><div class="h1"></div>
+            <div class="h0"></div><div class="h3"></div><div class="h0"></div><div class="h3"></div><div class="h0"></div><div class="h0"></div><div class="h3"></div><div class="h0"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="headline left">Five communities meet every test for where to start</div>
+      <p class="read-key">Each card reads: <strong>need score</strong> (0–100, higher = more need, ranked against the other 54 communities) · <strong>population</strong> reached (2020) · <strong>life-expectancy gap</strong> vs. the 2018 citywide average · <strong>years in the worst 10</strong> for life expectancy, out of the eight years measured (2011–2018).</p>
+      <div id="community-list" class="scorecards"></div>
+
+      <div class="legend-row">
+        <span>Need tier:</span>
+        <span><span class="swatch" style="background:var(--teal-pale);"></span>Lower</span>
+        <span><span class="swatch" style="background:#8CC9B4;"></span>Moderate</span>
+        <span><span class="swatch" style="background:#4FA98C;"></span>High</span>
+        <span><span class="swatch" style="background:var(--teal);"></span>Highest</span>
+        <span style="margin-left:auto; color:var(--coral);"><i class="ti ti-star" style="font-size:.85rem;"></i> Recommended starting point</span>
+      </div>
+    </div>
+
+    <h3 class="spec-h">Worksheets on this dashboard</h3>
+    <table class="spec">
+      <tr><th>Worksheet</th><th>Chart headline</th><th>Chart type</th><th>Source / key fields</th></tr>
+      <tr>
+        <td>Life expectancy map</td>
+        <td>"Life expectancy varies by up to 18 years between neighborhoods a few miles apart"</td>
+        <td>Filled map</td>
+        <td><span class="src">2018_Analysis</span> Life Expectancy, boundary join on CSA</td>
+      </tr>
+      <tr>
+        <td>Need &amp; life expectancy map</td>
+        <td>"Deprivation and short life expectancy sit in the same neighborhoods"</td>
+        <td>Filled map</td>
+        <td><span class="src">Service_Need_Profile</span> Tier, Composite</td>
+      </tr>
+      <tr>
+        <td>Persistence heatmap</td>
+        <td>"The same communities have ranked worst for eight straight years"</td>
+        <td>Highlight table</td>
+        <td><span class="src">Historical_Trends</span> filtered to Life Expectancy, 2011–2018, calc field <code>Worst 10 Flag</code></td>
+      </tr>
+      <tr>
+        <td>KPI tiles</td>
+        <td>"The scale of the problem, in four numbers"</td>
+        <td>Text / BAN</td>
+        <td><span class="src">Service_Need_Profile</span>, <span class="src">Historical_Trends</span> aggregates</td>
+      </tr>
+      <tr>
+        <td>Recommended communities scorecard</td>
+        <td>"Five communities meet every test for where to start"</td>
+        <td>Card table</td>
+        <td><span class="src">Service_Need_Profile</span> filtered to <code>Is Recommended = 1</code></td>
+      </tr>
+    </table>
+
+    <h3 class="spec-h">Filters &amp; actions</h3>
+    <ul class="notes">
+      <li><strong>Global filter</strong> — Community (CSA) — applies to every worksheet on the dashboard.</li>
+      <li><strong>"Recommended 5 only" parameter toggle</strong> — swaps both maps and the heatmap between full-city view and the five-community view without changing sheets.</li>
+      <li><strong>Highlight action</strong> — clicking a community on either map highlights its row in the persistence heatmap and its card in the scorecard, and vice versa.</li>
+      <li><strong>Navigation button</strong> — "See what's driving this" links to Dashboard 2.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== DASHBOARD 2 ===================== -->
+  <section id="dash2" class="dash-panel">
+    <div class="dash-head">
+      <h2>Drivers &amp; service detail</h2>
+      <span class="tag">Reached by a button, not shown by default</span>
+    </div>
+    <p class="dash-sub">Backs up the recommendation for a skeptical Board member or a funder — what actually correlates with the outcome, why these five communities specifically, and where each individual service is most needed.</p>
+
+    <div class="mockup">
+      <div class="frame-label">Layout — 680–960px canvas, single scroll</div>
+
+      <div class="filterbar">
+        <span class="pill"><i class="ti ti-arrow-back-up"></i>Back to overview</span>
+      </div>
+
+      <div class="grid2">
+        <div class="panel-block" style="align-items:stretch; text-align:left;">
+          <div class="headline" style="text-align:left; margin-bottom:.7rem;">Income and housing condition track health closely; employment and business barely do</div>
+          <div class="barrow"><span class="k">Income</span><div class="bartrack"><div class="barfill" style="width:71%;"></div></div><span class="v">0.71</span></div>
+          <div class="barrow"><span class="k">Safety</span><div class="bartrack"><div class="barfill" style="width:55%; opacity:.85;"></div></div><span class="v">0.55</span></div>
+          <div class="barrow"><span class="k">Housing</span><div class="bartrack"><div class="barfill" style="width:48%; opacity:.85;"></div></div><span class="v">0.48</span></div>
+          <div class="barrow"><span class="k">Family structure</span><div class="bartrack"><div class="barfill" style="width:39%; opacity:.6;"></div></div><span class="v">0.39</span></div>
+          <div class="barrow"><span class="k">Civic</span><div class="bartrack"><div class="barfill" style="width:34%; opacity:.6;"></div></div><span class="v">0.34</span></div>
+          <div class="barrow"><span class="k">Transport</span><div class="bartrack"><div class="barfill" style="width:32%; opacity:.6;"></div></div><span class="v">0.32</span></div>
+          <div class="barrow"><span class="k">Race</span><div class="bartrack"><div class="barfill" style="width:25%; opacity:.4;"></div></div><span class="v">0.25</span></div>
+          <div class="barrow"><span class="k">Employment</span><div class="bartrack"><div class="barfill" style="width:23%; opacity:.4;"></div></div><span class="v">0.23</span></div>
+          <div class="barrow"><span class="k">Environment</span><div class="bartrack"><div class="barfill" style="width:23%; opacity:.4;"></div></div><span class="v">0.23</span></div>
+          <div class="barrow"><span class="k">Business</span><div class="bartrack"><div class="barfill" style="width:9%; opacity:.4;"></div></div><span class="v">0.09</span></div>
+        </div>
+        <div class="panel-block">
+          <i class="ti ti-chart-scatter"></i>
+          <div class="headline">These five are needy, persistent, and large enough to matter — not just needy</div>
+          <div class="t">Need vs. life expectancy gap</div>
+          <div class="s">Bubble size = population, red = the five recommended communities, positioned upper right</div>
+        </div>
+      </div>
+
+      <div class="headline left">Different services are needed in different neighborhoods</div>
+      <div class="tiles4">
+        <div class="tile"><div class="h"><i class="ti ti-book"></i>Health literacy</div><div class="r">Westport/Mt Winans</div><div class="r">Southeastern</div></div>
+        <div class="tile"><div class="h"><i class="ti ti-car"></i>Navigation</div><div class="r">Oldtown/Middle East</div><div class="r">Greenmount East</div></div>
+        <div class="tile"><div class="h"><i class="ti ti-heart-handshake"></i>Caregiver load</div><div class="r">Pimlico/Arlington</div><div class="r">Southern Park Hts</div></div>
+        <div class="tile"><div class="h"><i class="ti ti-first-aid-kit"></i>Complex care</div><div class="r">Upton/Druid Heights</div><div class="r">Penn North</div></div>
+      </div>
+
+      <div class="legend-row">
+        <i class="ti ti-info-circle"></i>
+        <span>Health outcomes: 2018, most recent year available. Service-need indicators: 2023.</span>
+      </div>
+    </div>
+
+    <h3 class="spec-h">Worksheets on this dashboard</h3>
+    <table class="spec">
+      <tr><th>Worksheet</th><th>Chart headline</th><th>Chart type</th><th>Source / key fields</th></tr>
+      <tr>
+        <td>Domain correlation bars</td>
+        <td>"Income and housing condition track health; employment and business barely do"</td>
+        <td>Horizontal bar</td>
+        <td><span class="src">Correlations</span> filtered <code>Keep = TRUE</code>, calc field <code>Domain Median Corr</code></td>
+      </tr>
+      <tr>
+        <td>Need vs. gap scatter</td>
+        <td>"These five are needy, persistent, and large enough to matter"</td>
+        <td>Scatter / bubble</td>
+        <td><span class="src">Service_Need_Profile</span> Composite, Years below city 2018, population, <code>Is Recommended</code></td>
+      </tr>
+      <tr>
+        <td>Service-dimension tiles (×4)</td>
+        <td>"Different services are needed in different neighborhoods"</td>
+        <td>Small filled maps or ranked list</td>
+        <td><span class="src">Service_Need_Profile</span> Health literacy, Navigation barriers, Caregiver load, Complex care need</td>
+      </tr>
+      <tr>
+        <td>Data-year caveat</td>
+        <td>"Health outcomes stop at 2018 — read this alongside the 2023 need scores with care"</td>
+        <td>Text footer</td>
+        <td>—</td>
+      </tr>
+    </table>
+
+    <h3 class="spec-h">Filters &amp; actions</h3>
+    <ul class="notes">
+      <li><strong>Filter action</strong> — clicking a point on the scatter highlights that community back on Dashboard 1's map.</li>
+      <li><strong>No global toggle here</strong> — this screen is meant to be read in full, not filtered down, since its job is credibility rather than a quick scan.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  Source: <code>Baltimore_Vital_Signs_Tableau.xlsx</code> — sheets <code>Service_Need_Profile</code>, <code>2018_Analysis</code>, <code>2023_Analysis</code>, <code>Historical_Trends</code>, <code>Correlations</code>, joined on <code>CSA</code>. A Community Statistical Area boundary file is required for both filled maps; Tableau does not geocode CSAs natively.
+</footer>
+
+<script>
+function showDash(n, btn){
+  document.querySelectorAll('.dash-panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('dash'+n).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+}
+
+var highest13 = [
+  {n:'Greenmount East', need:85.0, pop:6955, gap:-5.0, worst10:8, rec:true},
+  {n:'Sandtown-Winchester/Harlem Park', need:84.3, pop:null, gap:-4.6, worst10:3, rec:false},
+  {n:'Southwest Baltimore', need:81.6, pop:13189, gap:-6.3, worst10:8, rec:true},
+  {n:'Clifton-Berea', need:78.8, pop:7577, gap:-5.3, worst10:8, rec:true},
+  {n:'Pimlico/Arlington/Hilltop', need:78.6, pop:null, gap:-5.6, worst10:6, rec:false},
+  {n:'Upton/Druid Heights', need:77.9, pop:8916, gap:-4.2, worst10:7, rec:true},
+  {n:'Midway/Coldstream', need:76.6, pop:7393, gap:-4.6, worst10:8, rec:true},
+  {n:'Oldtown/Middle East', need:75.2, pop:null, gap:-3.8, worst10:1, rec:false},
+  {n:'Cherry Hill', need:75.0, pop:null, gap:-2.4, worst10:3, rec:false},
+  {n:'Southern Park Heights', need:72.3, pop:null, gap:-3.8, worst10:1, rec:false},
+  {n:'Greater Rosemont', need:71.2, pop:null, gap:-4.2, worst10:1, rec:false},
+  {n:'Morrell Park/Violetville', need:71.1, pop:null, gap:-0.3, worst10:0, rec:false},
+  {n:'Brooklyn/Curtis Bay/Hawkins Point', need:70.2, pop:null, gap:-3.2, worst10:1, rec:false}
+];
+
+var showingRecOnly = true;
+
+function cardHtml(c){
+  var popLine = c.pop ? (c.pop.toLocaleString() + ' res.') : 'pop. not scored here';
+  var cls = c.rec ? 'scorecard' : 'scorecard dim';
+  return '<div class="'+cls+'">'
+    + '<div class="n">'+c.n+'</div>'
+    + '<div class="d">Need '+c.need.toFixed(1)+' · '+popLine+'</div>'
+    + '<div class="d">'+c.gap.toFixed(1)+' yrs · '+c.worst10+'/8</div>'
+    + '</div>';
+}
+
+function renderList(){
+  var list = showingRecOnly ? highest13.filter(function(c){return c.rec;}) : highest13;
+  document.getElementById('community-list').innerHTML = list.map(cardHtml).join('');
+  document.getElementById('toggle-label').textContent = showingRecOnly ? 'Recommended 5 only' : 'All 13 highest-need';
+  document.getElementById('toggle-pill').classList.toggle('on', showingRecOnly);
+}
+
+function toggleView(){
+  showingRecOnly = !showingRecOnly;
+  renderList();
+}
+
+renderList();
+</script>
+
+</body>
+</html>
