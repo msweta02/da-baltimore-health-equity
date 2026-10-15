@@ -10,7 +10,7 @@ An interactive Tableau dashboard that shows where Baltimore's community conditio
 
 ## Why this exists
 
-The Lily Foundation & Advocates wanted to know **where in Baltimore** to place patient navigation, advocacy, health literacy and caregiver support services.
+The starting question was **where in Baltimore** patient navigation, advocacy, health literacy and caregiver support services should be placed.
 
 The city publishes rich neighbourhood data through BNIA's *Vital Signs*: more than 200 indicators per neighbourhood, every year since 2010. In that form it's hard to act on. This project turns it into one view that answers three questions:
 
@@ -156,4 +156,4 @@ python prepare_dashboard_data.py
 
 **Baltimore Neighborhood Indicators Alliance (BNIA), Jacob France Institute, University of Baltimore:** *Vital Signs*, 2010–2023, by Community Statistical Area. CSA boundaries are the 2020 Community Statistical Areas published by BNIA and Baltimore City. Basemap © Mapbox © OpenStreetMap.
 
-Prepared for **The Lily Foundation & Advocates** by Mary Sweta Kerketta.
+Built by Mary Sweta Kerketta.

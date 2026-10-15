@@ -1,6 +1,5 @@
 # Income and the Prenatal Care Gap in Baltimore Communities
 
-**Prepared for:** The Lily Foundation & Advocates
 **Source:** BNIA Vital Signs, 2010–2023 · 55 Community Statistical Areas
 **Prenatal care:** 2019 (the latest year collected) · **Need tiers:** 2023
 **Companion to:** *Where Baltimore Communities Most Need Navigation, Advocacy, Literacy and

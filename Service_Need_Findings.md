@@ -1,6 +1,5 @@
 # Where Baltimore Communities Most Need Navigation, Advocacy, Literacy and Caregiver Support
 
-**Prepared for:** The Lily Foundation & Advocates
 **Source:** BNIA Vital Signs, 2010–2023 · 55 Community Statistical Areas
 **Current conditions:** 2023 · **Health outcomes:** 2018 (see *Limitations and data-quality concerns*)
 

@@ -1,5 +1,5 @@
 # Tableau Build Steps
-### Baltimore Community Health & Access · The Lily Foundation & Advocates
+### Baltimore Community Health & Access
 Built against `Baltimore_Vital_Signs_Tableau.xlsx`
 
 ---
