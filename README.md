@@ -61,7 +61,8 @@ All figures come from the dashboard's data (2023, 55 CSAs) unless a different ye
 | Years of history | **14** (2010–2023) |
 | Indicators in the trend table | **191** (95,437 CSA × indicator × year rows) |
 | Households | **250,608** |
-| Population (2020 Census, sum of CSAs) | **583,623**, down from 615,724 in 2010 |
+| City population (2020 Census) | **585,708**, down from 620,961 in 2010 |
+| City median household income (2023) | **$59,869**, up from $38,346 in 2010 |
 
 **Where need concentrates.** **9 CSAs** score above 80 on the Service Need Index and **21** score above 60. The five highest:
 
@@ -88,7 +89,7 @@ All figures come from the dashboard's data (2023, 55 CSAs) unless a different ye
 - **Poverty and overdose go together.** Family poverty and overdose calls correlate at **r = 0.58** across CSAs.
 - **Who needs care isn't who faces barriers.** The share of residents aged 65+ barely relates to the Barrier Burden Index (**r = 0.08**). Communities with many older adults aren't necessarily the ones facing access barriers, so one combined index would send services to the wrong places.
 
-**Income has risen, but unevenly.** The median CSA household income grew from **$37,034 in 2010 to $55,871 in 2023**.
+**Income has risen, but unevenly.** Citywide median household income rose 56% between 2010 and 2023 ($38,346 to $59,869). The typical CSA in 2023 sat at $55,871.
 
 > The findings reports use their own scoring and tiering, so their community rankings differ slightly from the dashboard's Service Need Score.
 
@@ -144,9 +145,8 @@ python prepare_dashboard_data.py
 
 ## Known issues
 
-- **"City Population" card:** it shows the total number of **households** (250,608), not residents. The city's 2020 population is 583,623.
-- **"Median Household Income (City)" card:** the $42,908 shown pools every CSA and year from 2010 to 2023. The 2023 median across CSAs is $55,871.
-- **Eviction bars:** the labels show a "%" sign, but the measure is evictions **per 1,000 residents**.
+- **"What's Driving the Need?" chart:** the Evictions Rate and Overdose Calls bars show a "%" sign, but both measures are rates per 1,000 residents.
+- **"What's Driving the Need?" chart:** the Evictions Rate and Overdose Calls bars show a "%" sign, but both measures are rates per 1,000 residents.
 - **Year label:** the "Analysis Year" label assumes exactly 14 years of data (`= 14` in the `Year Display` calculation), so it will need updating when 2024 data is added.
 - **Health outcomes:** life expectancy is last available for 2018 and prenatal care for 2019. Current conditions use 2023.
 
